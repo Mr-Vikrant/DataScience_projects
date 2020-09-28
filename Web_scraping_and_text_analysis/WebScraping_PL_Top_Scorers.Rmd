@@ -1,0 +1,95 @@
+What is web scraping?
+1. Web scraping is the common name for extracting data from the Internet. This can include, copy-and-pasting, making ‘calls’ to an API or capturing and parsing the data. (API is the acronym for Application Programming Interface, which is a software intermediary that allows two applications to talk to each other. Each time you use an app like Facebook, send an instant message, or check the weather on your phone, you're using an API.)
+2. To master web scraping you must familiarize yourself with HTTP (Hypertext Transfer Protocol) and Internet languages like HTML (Hypertext Markup Language)
+
+We are scraping the data of the Top Scorers of the English Premier League for the season 2018/19.
+
+## Basic Web Scraping
+To web scrape we just capture the HTML
+```{r}
+
+#rm() is basically 'remove{base}', it is used to Remove Objects from a Specified Environment. list=ls() is base in this command that means you are referring to all the objects present in the workspace. similarly, rm() is used to remove all the objects from the workspace when you use list=ls() as base.
+rm(list=ls())
+
+#a new library for making and parsing web pages
+library("rvest")
+
+#the web 'call'
+url <- "https://www.bbc.com/sport/football/premier-league/top-scorers"
+
+#read the HTML and store it in a variable
+webpage <- read_html(url)
+
+```
+
+```{r}
+
+#pulling out names of the players
+playernames_data_html <- html_nodes(webpage,'h2.top-player-stats__name.gel-double-pica')
+
+#parsing the nodes
+playernames_data <- html_text(playernames_data_html)
+head(playernames_data)
+
+```
+
+```{r}
+
+#Let's next grab the names of the teams
+teamname_data_html <- html_nodes(webpage,'span.gel-long-primer.team-short-name')
+teamname_data <- html_text(teamname_data_html)
+head(teamname_data)
+
+```
+
+```{r}
+
+#next we grab the number of goals scored by each player
+goals_data_html <- html_nodes(webpage,'span.top-player-stats__goals-scored-number')
+goals_data <- html_text(goals_data_html)
+head(goals_data)
+
+
+```
+
+```{r}
+
+#now we are going to take the assists by each player
+assists_data_html <- html_nodes(webpage,'span.top-player-stats__assists-number.gel-double-pica')
+assists_data <- html_text(assists_data_html)
+head(assists_data)
+
+
+```
+
+```{r}
+#next we take total shots taken by a player
+ts_data_html <- html_nodes(webpage,'span.percentage-bar-chart__total.gel-pica.shots-total')
+ts_data <- html_text(ts_data_html)
+head(ts_data)
+
+```
+
+```{r}
+#now we take the number of on target shots
+ot_data_html <- html_nodes(webpage,'span.percentage-bar-chart__figure.gel-minion.shots-on-goal-total')
+ot_data <- html_text(ot_data_html)
+head(ot_data)
+```
+
+```{r}
+#now we take the Percentage of Shots that were on target
+pcsog_data_html <- html_nodes(webpage,'span.percentage-bar-chart__percentage.gel-pica.percentage-goals-on-target')
+pcsog_data <- html_text(pcsog_data_html)
+head(pcsog_data)
+```
+
+```{r}
+
+#putting them all together in one dataframe
+eplstats_df<-data.frame(Players = playernames_data, Teams = teamname_data, 
+                      Goals = goals_data, Assists = assists_data, Total_Shots = ts_data,
+                      Shots_On_Target=ot_data, Percentage_Shots_On_Goal=pcsog_data)
+View(eplstats_df)
+
+```
